@@ -1,13 +1,20 @@
 package com.example.bookstore.Entities;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -27,21 +34,25 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long cartid;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userid")
     private User user;
 
-    @ManyToMany(mappedBy = "cart")
-    private List<Books> books;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    private List<Order> orders = new ArrayList<>(); // Ensure this is a collection
 
-    // check the below any missing
-    @OneToOne(mappedBy = "cart")
-    private Order orders;
+    @ManyToMany(cascade = CascadeType.PERSIST)  // Books relationship
+    @JoinTable(
+        name = "cart_books", 
+        joinColumns = @JoinColumn(name = "cartid"), 
+        inverseJoinColumns = @JoinColumn(name = "bookid"))
+    private List<Books> books = new ArrayList<>();
 
-    @Transient
+    @Column(name = "totalamount")
     private BigDecimal totalAmount;
 
-    @Transient
+    @Column(name = "totalitems")
     private int totalItems;
 
     @PrePersist
@@ -51,12 +62,11 @@ public class Cart {
         int itemsCount = 0;
     
         for (Books book : books) {
-            total = total.add(book.getPrice());  // Add the price of each book
-            itemsCount++;  // Increment the item count
+            total = total.add(book.getPrice());
+            itemsCount++;
         }
     
         totalAmount = total;
         totalItems = itemsCount;
-    }    
-    
+    }
 }

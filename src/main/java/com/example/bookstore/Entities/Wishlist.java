@@ -1,5 +1,8 @@
 package com.example.bookstore.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,9 +23,11 @@ public class Wishlist {
 
     @ManyToOne
     @JoinColumn(name = "userid")
+    @JsonBackReference
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "bookid")
+    @JsonProperty("book")
     private Books books;
 }

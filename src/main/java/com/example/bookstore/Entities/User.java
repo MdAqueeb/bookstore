@@ -3,6 +3,9 @@ package com.example.bookstore.Entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,6 +57,7 @@ public class User {
 
     // Add favorities method one to many relationship;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Wishlist> wishlist = new ArrayList<>();
 
 
@@ -62,5 +66,6 @@ public class User {
     private List<Order> orders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Cart> cart = new ArrayList<>();
 }
