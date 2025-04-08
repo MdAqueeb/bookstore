@@ -1,5 +1,6 @@
 package com.example.bookstore.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.bookstore.Entities.Books;
 import com.example.bookstore.Entities.Cart;
 import com.example.bookstore.Entities.User;
-import com.example.bookstore.Entities.Wishlist;
 import com.example.bookstore.Repository.BookRepo;
 import com.example.bookstore.Repository.CartRepo;
 import com.example.bookstore.Repository.UserRepo;
@@ -38,30 +38,36 @@ public class CartService {
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
 
         // Find the user's cart
-        Cart cart = cartrepo.findByUserId(user);
-        
-        if (cart == null) {
+        Optional<Cart> cart = cartrepo.findByUserId(user);
+
+        Cart cartToSave;
+        if (!cart.isPresent()) {
             // If the cart doesn't exist, create a new one
-            cart = new Cart();
-            cart.setUser(usr); // Initialize the books list
+            cartToSave = new Cart();
+            cartToSave.setUser(usr);
+            cartToSave.setBooks(new ArrayList<>());
+            cartToSave.setTotalAmount(BigDecimal.ZERO);
+            cartToSave.setTotalItems(0);
+        } else {
+            cartToSave = cart.get();
         }
 
         // Add the book to the cart (do not overwrite the previous list)
-        List<Books> items = cart.getBooks();
+        List<Books> items = cartToSave.getBooks();
         if (!items.contains(bok)) { // Avoid duplicate entries
             items.add(bok); // Add the book to the cart if it's not already in it
         }
-
+        
         // Recalculate the cart details
-        cart.calculateCartDetails();  // This will update the totalAmount and totalItems
+        cartToSave.calculateCartDetails();  // This will update the totalAmount and totalItems
         
         // Save the updated cart
-        return cartrepo.save(cart);
+        return cartrepo.save(cartToSave);
     }
 
     public List<Books> getItemsInCart(long userId) {
         // Find the user's cart by their user ID
-        Cart cart = cartrepo.findByUserId(userId);
+        Cart cart = cartrepo.findByUserId(userId).get();
 
         // If the cart is not found, return null or an empty list depending on your needs
         if (cart == null) {

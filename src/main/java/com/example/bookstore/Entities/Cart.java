@@ -24,6 +24,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Data;
+import lombok.ToString;
+import jakarta.persistence.SequenceGenerator;
 
 @Entity
 @Data
@@ -31,18 +33,24 @@ import lombok.Data;
 public class Cart {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "cart_seq")
+    @SequenceGenerator(name = "cart_seq", sequenceName = "cart_sequence", allocationSize = 1)
     private long cartid;
 
-    @JsonIgnore
+    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userid")
+    @ToString.Exclude
     private User user;
 
+    // @ToString.Exclude
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Order> orders = new ArrayList<>(); // Ensure this is a collection
 
     @ManyToMany(cascade = CascadeType.PERSIST)  // Books relationship
+    @JsonIgnore
+    @ToString.Exclude
     @JoinTable(
         name = "cart_books", 
         joinColumns = @JoinColumn(name = "cartid"), 

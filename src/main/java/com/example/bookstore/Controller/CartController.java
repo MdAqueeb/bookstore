@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+
 public class CartController {
 
     @Autowired
@@ -34,15 +35,17 @@ public class CartController {
         return new ResponseEntity<>(val,HttpStatus.CREATED);
     }
     
-    @GetMapping("/cart/{userId}")
+    @PostMapping("/cart/{userId}")
     public ResponseEntity<List<Books>> getCartItems(@PathVariable long userId) {
+        System.out.println("The userid for getting allboks");
         List<Books> books = cartserve.getItemsInCart(userId);
 
         if (books == null || books.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // If no items found
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);  
         }
 
-        return new ResponseEntity<>(books, HttpStatus.OK);  // Return the list of books in the cart
+        return new ResponseEntity<>(books, HttpStatus.OK);  
     }
+    
 
 }

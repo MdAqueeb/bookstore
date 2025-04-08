@@ -14,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -43,8 +44,10 @@ public class User {
     @Column(nullable = false)
     private String address;
 
-    @Builder.Default
-    private String avator = "https://wallpapers.com/images/hd/user-profile-placeholder-icon-1val0kp6a7ji4vsi.png";
+    // @Builder.Default
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String avator ;
 
     @Enumerated(EnumType.STRING)    
     @Column(nullable = false)
@@ -52,20 +55,30 @@ public class User {
     private Role role = Role.USER;
 
     public enum Role{
-        USER,ADMIN;
+        USER,ADMIN,SELLER;
     }
 
-    // Add favorities method one to many relationship;
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    // Add book listings for seller
+    @ToString.Exclude
+    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Wishlist> wishlist = new ArrayList<>();
-
+    private List<Books> bookListings = new ArrayList<>();
+    
+    // Indicates if the book listing is approved by admin (for SELLER role)
+    @Column(nullable = true)
+    private Boolean isApproved = false;
 
     // i have to show all orders what i have order from past so i not use all if any other type is missing then provide
     @OneToMany(mappedBy = "user",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
+    @JsonIgnore
     private List<Order> orders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Cart> cart = new ArrayList<>();
+
+    public User orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 }

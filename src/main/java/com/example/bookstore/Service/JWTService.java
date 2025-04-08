@@ -1,6 +1,5 @@
 package com.example.bookstore.Service;
 
-
 // import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -41,15 +40,15 @@ public class JWTService {
             throw new RuntimeException(e);
         }
     }
-    public String generate_Token(String username){
+    public String generate_Token(String username, String email) {
         Map<String,Object> claims = new HashMap<>();
-        
+        claims.put("name", username);
         return Jwts.builder()
             .claims()
             .add(claims)
-            .subject(username)
+            .subject(email)
             .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(new Date(System.currentTimeMillis()+1000*60*5))
+            .expiration(new Date(System.currentTimeMillis()+1000*60*60)) // Increased to 1 hour
             .and()
             .signWith(getKey())
             .compact();
@@ -62,7 +61,7 @@ public class JWTService {
             .add(claims)
             .subject(username)
             .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(new Date(System.currentTimeMillis()+1000*60*2))
+            .expiration(new Date(System.currentTimeMillis()+1000*60*60*24)) // 24 hours
             .and()
             .signWith(getrefershKey())
             .compact();

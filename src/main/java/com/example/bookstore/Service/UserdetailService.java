@@ -1,6 +1,5 @@
 package com.example.bookstore.Service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,22 +14,17 @@ import com.example.bookstore.Repository.UserRepo;
 // import jwtauthentication.application.Entities.Userprinciples;
 
 @Service
-public class UserdetailService implements UserDetailsService{
+public class UserdetailService implements UserDetailsService {
 
     @Autowired
     private UserRepo repo;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        // TODO Auto-generated method stub
-        User user1 = repo.findByUserName(username);
-        if(user1 == null){
-            System.out.println("Not found");
-            throw new UsernameNotFoundException("User Not found");
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = repo.findByEmail(email).get();
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
-        return new Userprinciples(user1);
-        // throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
+        return new Userprinciples(user);
     }
-    
 }
