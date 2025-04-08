@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["jdk21", "maven"]  
+nixPkgs = ["maven", "jdk21"]
 
 [phases.build]
-cmds = ["mvn clean install"]
+cmds = ["mvn -B -e clean install"]
 
-[phases.start]
+[start]
 cmd = "java -jar target/bookstore-0.0.1-SNAPSHOT.jar"
