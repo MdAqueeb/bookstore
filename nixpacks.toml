@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["maven", "jdk21"]
+nixPkgs = ["maven", "jdk23"]
 
 [phases.build]
 cmds = ["mvn -B -e clean install"]
