@@ -2,6 +2,7 @@ package com.example.bookstore.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,23 +30,26 @@ public class CartService {
     @Autowired
     private UserRepo userrepo;
 
-    public Cart AddItem(long user, long book) {
+    public Cart AddItem(String email,long book) {
         // Retrieve the User and Book from the database
-        User usr = userrepo.findById(user)
+        User usr = userrepo.findByEmail(email)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Books bok = bookrepo.findById(book)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
 
         // Find the user's cart
-        Optional<Cart> cart = cartrepo.findByUserId(user);
+        if(usr == null || bok == null){
+            return null;
+        }
+
+        Optional<Cart> cart = cartrepo.findByUserId(usr.getUserid());
 
         Cart cartToSave;
         if (!cart.isPresent()) {
             // If the cart doesn't exist, create a new one
             cartToSave = new Cart();
             cartToSave.setUser(usr);
-            cartToSave.setBooks(new ArrayList<>());
             cartToSave.setTotalAmount(BigDecimal.ZERO);
             cartToSave.setTotalItems(0);
         } else {
@@ -65,17 +69,46 @@ public class CartService {
         return cartrepo.save(cartToSave);
     }
 
-    public List<Books> getItemsInCart(long userId) {
+    public List<Books> getItemsInCart(String email) {
         // Find the user's cart by their user ID
-        Cart cart = cartrepo.findByUserId(userId).get();
+        User usr = userrepo.findByEmail(email)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        if(usr == null){
+            return new ArrayList<>();
+        }
+        Cart cart = cartrepo.findByUserId(usr.getUserid()).get();
 
-        // If the cart is not found, return null or an empty list depending on your needs
         if (cart == null) {
-            return null;  // or return an empty list if you prefer
+            return null;  
         }
 
-        // Return the list of books in the cart
         return cart.getBooks();
     }
+
+    public String removeCartBook(String email, long bookid) {
+        // Retrieve user by email
+        User usr = userrepo.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        // Retrieve user's cart
+        Cart cart = cartrepo.findByUserId(usr.getUserid())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
+    
+        // Iterate through the books in the cart using an Iterator for safe removal
+        Iterator<Books> iterator = cart.getBooks().iterator();
+        String res = "Book not found in cart";
+        while (iterator.hasNext()) {
+            Books book = iterator.next();
+            if (book.getBookid() == bookid) {
+                iterator.remove();  // Safely remove the book from the cart
+                res = "Book Found";
+                break;
+            }
+        }
+        cartrepo.save(cart);
+        return res;
+    }
+    
 
 }
