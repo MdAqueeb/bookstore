@@ -63,6 +63,11 @@ public class User {
     @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Books> bookListings = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "userid",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<RequestSellerRole> requestSellerRole = new ArrayList<>();
     
     // Indicates if the book listing is approved by admin (for SELLER role)
     @Column(nullable = true)
