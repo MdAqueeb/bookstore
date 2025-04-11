@@ -24,35 +24,37 @@ public class SellerService {
     private UserRepo userRepository;
 
     public Books addBook(Books book, String email) {
-        User seller = userRepository.findByEmail(email).get();
-        if(seller == null){
+        Optional<User> optionalSeller = userRepository.findByEmail(email);
+    
+        if (!optionalSeller.isPresent()) {
             throw new RuntimeException("User not found");
         }
+    
+        User seller = optionalSeller.get();
+    
         if (seller.getRole() != User.Role.SELLER && seller.getRole() != User.Role.ADMIN) {
             throw new RuntimeException("User is not authorized to sell books");
         }
-
-        // Set initial approval status (auto-approve for admin, pending for sellers)
+    
         if (seller.getRole() == User.Role.ADMIN) {
             book.setApproved(true);
         } else {
             book.setApproved(false);
         }
-        
-        // Associate the book with the seller
+    
+        book.setSeller(seller);
+    
+        Books savedBook = booksRepository.save(book);
+        System.out.println("Book saved: " + savedBook.getTitle() + " | ID: ");
+    
         if (seller.getBookListings() == null) {
             seller.setBookListings(new ArrayList<>());
         }
-        
-        // Save the book first
-        Books savedBook = booksRepository.save(book);
-        
-        // Add the book to seller's listings
         seller.getBookListings().add(savedBook);
-        userRepository.save(seller);
-        
+    
         return savedBook;
     }
+    
 
     public List<Books> getBooksBySellerEmail(String email) {
         User seller = userRepository.findByEmail(email).get();

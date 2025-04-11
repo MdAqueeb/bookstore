@@ -30,6 +30,7 @@ public class SellerController {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
+            System.out.println(email+" This is the email");
             Books savedBook = sellerService.addBook(book, email);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
         } catch (Exception e) {

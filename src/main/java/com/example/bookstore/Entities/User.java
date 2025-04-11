@@ -64,7 +64,7 @@ public class User {
     @JsonIgnore
     private List<Books> bookListings = new ArrayList<>();
 
-
+    @ToString.Exclude
     @OneToMany(mappedBy = "userid",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<RequestSellerRole> requestSellerRole = new ArrayList<>();
