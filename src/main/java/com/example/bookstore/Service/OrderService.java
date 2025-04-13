@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,10 +51,32 @@ public class OrderService {
             return null;
         }
         Optional<Cart> cart = cartRepository.findByUserId(usr.get().getUserid());
+        if(!cart.isPresent()){
+            return null;
+        }
+        else if(cart.get().getBooks().isEmpty()){
+            return null;
+        }
         Order order = new Order();
 
         order.setUser(usr.get());
-        order.setCart();
+        order.setCart(cart.get());  
+        
+        
+        List<OrderItem> items = new ArrayList<>();
+        for(int i = 0;i < vlue.getOrderItems().size();i++){
+            OrderItem item = new OrderItem();
+            Optional<Books> book = bookRepository.findById(vlue.getOrderItems().get(i).getBookId());
+            if(!book.isPresent()){
+                continue;
+            }
+            item.setBook(book.get());
+            item.setOrder(order);
+            item.setPrice(book.get().getPrice());
+            User sellr = book.get().getSeller();
+            item.getSeller();
+
+        }
 
         
         return null;
