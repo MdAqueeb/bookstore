@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,8 +49,9 @@ public class Books {
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String image;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private Boolean approved = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Approved approved ;
 
     @ToString.Exclude
     @ManyToOne
@@ -68,4 +71,8 @@ public class Books {
     @ManyToMany(mappedBy = "books")
     @JsonIgnore
     private List<Cart> cart = new ArrayList<>();
+
+    public enum Approved{
+        PENDING,REJECTED,ACCEPTED;
+    }
 }

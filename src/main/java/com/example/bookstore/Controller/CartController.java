@@ -57,7 +57,7 @@ public class CartController {
             List<Books> books = cartserve.getItemsInCart(email);
             System.out.println(books);
             if (books.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);  
+                return new ResponseEntity<>(books,HttpStatus.NO_CONTENT);  
             }
             return new ResponseEntity<>(books,HttpStatus.OK);
         } catch (Exception e){

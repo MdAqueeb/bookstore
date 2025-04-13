@@ -37,9 +37,9 @@ public class SellerService {
         }
     
         if (seller.getRole() == User.Role.ADMIN) {
-            book.setApproved(true);
+            book.setApproved(Books.Approved.ACCEPTED);
         } else {
-            book.setApproved(false);
+            book.setApproved(Books.Approved.PENDING);
         }
     
         book.setSeller(seller);

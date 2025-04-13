@@ -45,25 +45,30 @@ public class Order {
     @ToString.Exclude
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "adminid")
-    @ToString.Exclude
-    private User admin;
-
+    // @ManyToOne
+    // @JoinColumn(name = "adminid")
     // @ToString.Exclude
+    // private User admin;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     @JsonIgnore
     @ToString.Exclude
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    private BigDecimal totalAmount;
     
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private OrderStatus status;
+    private BigDecimal totalAmount;
 
-    private String paymentId;
+    @Column(nullable = false)
+    private String shippingAddress;
+
+    // @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private String status = "Placed";
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal payment;
     private LocalDateTime orderDate;
     private LocalDateTime updatedAt;
 
@@ -72,21 +77,15 @@ public class Order {
     @ToString.Exclude
     private Cart cart;
 
-    @OneToOne(mappedBy = "orders")
-    @ToString.Exclude
-    private ShippingDetails shippingDetails;
-
-    @OneToOne(mappedBy = "orders")
-    @ToString.Exclude
-    private Payment payment;
+    // @OneToOne(mappedBy = "orders")
+    // @ToString.Exclude
+    // private Payment payment;
 
     @PrePersist
     protected void onCreate() {
         orderDate = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (status == null) {
-            status = OrderStatus.PENDING;
-        }
+
     }
 
     @PreUpdate
@@ -94,13 +93,13 @@ public class Order {
         updatedAt = LocalDateTime.now();
     }
 
-    public enum OrderStatus {
-        PENDING,
-        PAID,
-        PROCESSING,
-        SHIPPED,
-        DELIVERED,
-        CANCELLED,
-        REFUNDED
-    }
+    // public enum OrderStatus {
+    //     PENDING,
+    //     PAID,
+    //     PROCESSING,
+    //     SHIPPED,
+    //     DELIVERED,
+    //     CANCELLED,
+    //     REFUNDED
+    // }
 }

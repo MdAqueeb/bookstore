@@ -1,5 +1,7 @@
 package com.example.bookstore.Configuration;
 
+import com.example.bookstore.DTO.OrderRequestDTO;
+import com.example.bookstore.Repository.OrderRepository;
 import com.example.bookstore.Security.JwtFilter;
 import com.example.bookstore.Service.UserdetailService;
 
@@ -79,6 +81,11 @@ public class AppConfig {
     @Bean
     public AuthenticationManager authenticationmanager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+    
+    @Bean
+    public OrderRequestDTO orderRequestDTO() {
+        return new OrderRequestDTO();
     }
 }
 

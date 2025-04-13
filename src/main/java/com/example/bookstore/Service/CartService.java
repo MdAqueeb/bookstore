@@ -71,19 +71,20 @@ public class CartService {
 
     public List<Books> getItemsInCart(String email) {
         // Find the user's cart by their user ID
-        User usr = userrepo.findByEmail(email)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
-        if(usr == null){
+        Optional<User> usr = userrepo.findByEmail(email);
+        if(!usr.isPresent()){
+            // System.out.println(usr.get());
             return new ArrayList<>();
         }
-        Cart cart = cartrepo.findByUserId(usr.getUserid()).get();
+        System.out.println(usr.get());
+        Optional<Cart> cart = cartrepo.findByUserId(usr.get().getUserid());
 
-        if (cart == null) {
-            return null;  
+
+        if(!cart.isPresent()) { 
+            return new ArrayList<>();
         }
 
-        return cart.getBooks();
+        return cart.get().getBooks();
     }
 
     public String removeCartBook(String email, long bookid) {

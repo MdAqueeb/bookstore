@@ -29,9 +29,9 @@ public class BookService {
 
         // Set approval status based on user role
         if (user.getRole() == User.Role.ADMIN) {
-            book.setApproved(true);
+            book.setApproved(Books.Approved.ACCEPTED);
         } else if (user.getRole() == User.Role.SELLER) {
-            book.setApproved(false); // Sellers need admin approval
+            book.setApproved(Books.Approved.PENDING); // Sellers need admin approval
         } else {
             throw new RuntimeException("User is not authorized to add books");
         }
@@ -57,7 +57,7 @@ public class BookService {
 
     public List<Books> getAll() {
         // Only return approved books for public view
-        return bookManipulaiton.findByApproved(true);
+        return bookManipulaiton.findByApproved(Books.Approved.ACCEPTED.name());
     }
 
     public List<Books> getAllIncludingUnapproved() {
@@ -69,7 +69,7 @@ public class BookService {
         // Search for books by author (only approved books)
         List<Books> books = bookManipulaiton.findByAuthorContainingIgnoreCase(author);
         return books.stream()
-                .filter(book -> book.getApproved() != null && book.getApproved())
+                .filter(book ->  book.getApproved().equals(Books.Approved.ACCEPTED))
                 .collect(java.util.stream.Collectors.toList());
     }
     
@@ -77,13 +77,13 @@ public class BookService {
         // Search for books by title (only approved books)
         List<Books> books = bookManipulaiton.findByTitleContainingIgnoreCase(title);
         return books.stream()
-                .filter(book -> book.getApproved() != null && book.getApproved())
+                .filter(book -> book.getApproved().equals(Books.Approved.ACCEPTED))
                 .collect(java.util.stream.Collectors.toList());
     }
 
     public List<Books> getBooksByPriceAsc() {
         // Get approved books sorted by price (ascending)
-        return bookManipulaiton.findByApprovedOrderByPriceAsc(true);
+        return bookManipulaiton.findByApprovedOrderByPriceAsc(Books.Approved.ACCEPTED);
     }
     
     // public List<Books> getBooksByPriceDesc() {
@@ -96,7 +96,7 @@ public class BookService {
         if (book.isPresent()) {
             Books foundBook = book.get();
             // Only return if approved or admin is accessing
-            if (foundBook.getApproved() != null && foundBook.getApproved()) {
+            if (book.get().getApproved().equals(Books.Approved.ACCEPTED)) {
                 return foundBook;
             }
             // If not approved, will return null, which the controller will handle as not found
@@ -118,9 +118,9 @@ public class BookService {
         List<Books> savedBook = new ArrayList<>();
         for(int i = 0;i < entity.size();i++){
             if (user.getRole() == User.Role.ADMIN) {
-                entity.get(i).setApproved(true);
+                entity.get(i).setApproved(Books.Approved.ACCEPTED);
             } else if (user.getRole() == User.Role.SELLER) {
-                entity.get(i).setApproved(false); // Sellers need admin approval
+                entity.get(i).setApproved(Books.Approved.PENDING); // Sellers need admin approval
             } else {
                 throw new RuntimeException("User is not authorized to add books");
             }

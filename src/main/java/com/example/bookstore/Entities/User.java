@@ -70,20 +70,21 @@ public class User {
     private List<RequestSellerRole> requestSellerRole = new ArrayList<>();
     
     // Indicates if the book listing is approved by admin (for SELLER role)
-    @Column(nullable = true)
-    private Boolean isApproved = false;
+    // @Column(nullable = true)
+    // private Boolean isApproved = false;
 
     // i have to show all orders what i have order from past so i not use all if any other type is missing then provide
     @OneToMany(mappedBy = "user",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JsonIgnore
     private List<Order> orders = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Cart> cart = new ArrayList<>();
 
-    public User orElseThrow(Object object) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
-    }
+    // public User orElseThrow(Object object) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    // }
 }
