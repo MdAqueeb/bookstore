@@ -67,7 +67,6 @@ public class JWTService {
             .compact();
     }
     private SecretKey getKey() {
-        // TODO Auto-generated method stub
         byte[] KeyBytes = Decoders.BASE64.decode(Secretkey);
         return Keys.hmacShaKeyFor(KeyBytes);
         // throw new UnsupportedOperationException("Unimplemented method 'getKey'");
