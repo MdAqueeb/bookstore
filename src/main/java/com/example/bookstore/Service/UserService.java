@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.example.bookstore.DTO.ForgotPassword;
 import com.example.bookstore.DTO.LoginForm;
 import com.example.bookstore.Entities.User;
 import com.example.bookstore.Repository.UserRepo;
@@ -77,5 +78,24 @@ public class UserService {
         }
         return user.get();
         // TODO Auto-generated method stub
+    }
+
+    public User Verify(String email) {
+        Optional<User> usr = usertable.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
+        return usr.get();
+    }
+
+    public User UpdatePassword(ForgotPassword entity) {
+        Optional<User> usr = usertable.findByEmail(entity.getEmail());
+        if(!usr.isPresent()){
+            return null;
+        }
+        if(entity.getPassword().equals(entity.getConfirmPassword())){
+            usr.get().setPassword(bcrypt.encode(entity.getConfirmPassword()));
+        }
+        return usertable.save(usr.get());
     }
 }

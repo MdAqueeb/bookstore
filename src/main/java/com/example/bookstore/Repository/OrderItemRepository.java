@@ -1,9 +1,9 @@
-package com.example.bookstore.Repository;
+// package com.example.bookstore.Repository;
 
-import com.example.bookstore.Entities.OrderItem;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+// import com.example.bookstore.Entities.OrderItem;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.stereotype.Repository;
 
-@Repository
-public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-} 
+// @Repository
+// public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+// } 

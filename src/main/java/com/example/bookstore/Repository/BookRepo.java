@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.bookstore.Entities.Books;
-import com.example.bookstore.Entities.Books.Approved;
 
 @Repository
 public interface BookRepo extends JpaRepository<Books, Long> {

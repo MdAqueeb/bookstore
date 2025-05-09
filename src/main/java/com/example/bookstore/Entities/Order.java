@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,14 +17,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+// import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import jakarta.persistence.CascadeType;
+// import jakarta.persistence.CascadeType;
 
 @Entity
 @Data
@@ -45,61 +43,52 @@ public class Order {
     @ToString.Exclude
     private User user;
 
-    // @ManyToOne
-    // @JoinColumn(name = "adminid")
-    // @ToString.Exclude
-    // private User admin;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @Builder.Default
-    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "bookid")
     @ToString.Exclude
-    private List<OrderItem> orderItems = new ArrayList<>();
-
-    
-    private BigDecimal totalAmount;
-
-    @Column(nullable = false)
-    private String shippingAddress;
-
-    // @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    @Builder.Default
-    private String status = "Placed";
+    private Books book ;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal payment;
-    private LocalDateTime orderDate;
-    private LocalDateTime updatedAt;
+    private BigDecimal totalAmount;
 
-    @OneToOne
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private OrderStatus status = OrderStatus.PENDING;
+
+    @Column(unique = true)
+    private String razorpayOrderId;
+    // @Column(nullable = false)
+    // private String razorpayPaymentId;
+    private LocalDateTime orderDate;
+
+    @ManyToOne
     @JoinColumn(name = "cartid", nullable = true)
     @ToString.Exclude
-    private Cart cart;
+    private Cart cart ;
 
-    // @OneToOne(mappedBy = "orders")
-    // @ToString.Exclude
-    // private Payment payment;
+    // @OneToOne
+    // @JoinColumn(name = "paymentid", nullable = false)
+    // private Payment payments;
+
 
     @PrePersist
     protected void onCreate() {
         orderDate = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
 
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    public enum OrderStatus {
+        PENDING,
+        PAID,
+        CANCELLED,
     }
 
-    // public enum OrderStatus {
-    //     PENDING,
-    //     PAID,
-    //     PROCESSING,
-    //     SHIPPED,
-    //     DELIVERED,
-    //     CANCELLED,
-    //     REFUNDED
-    // }
+    public boolean isCartOrder(){
+        return cart != null && book == null;
+    }
+
+    public boolean isSingleItemOrder(){
+        return book != null && cart == null;
+    }
 }

@@ -1,7 +1,6 @@
 package com.example.bookstore.Configuration;
 
-import com.example.bookstore.DTO.OrderRequestDTO;
-import com.example.bookstore.Repository.OrderRepository;
+import com.example.bookstore.DTO.OrderResponseDTO;
 import com.example.bookstore.Security.JwtFilter;
 import com.example.bookstore.Service.UserdetailService;
 
@@ -40,20 +39,21 @@ public class AppConfig {
     @Bean
     public SecurityFilterChain ownsecurity(HttpSecurity http) throws Exception {
         return http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS globally
-            .csrf(csrf -> csrf.disable()) // Disable CSRF when using JWT (cross-site request forgery)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests (CORS)
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Admin routes
-                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") // User routes
-                .requestMatchers("/seller/**").hasAnyRole("SELLER", "ADMIN") // Seller routes
-                .requestMatchers("/api/payments/webhook").permitAll() // Payment webhook is public
-                .requestMatchers("/api/payments/process").authenticated() // Payments process needs authentication
-                .requestMatchers("/getCsrf", "/registoration", "/login", "/AllBooks").permitAll() // Public routes
-                .anyRequest().authenticated() // All other routes require authentication
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                .requestMatchers("/admin/**").hasRole("ADMIN") 
+                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") 
+                .requestMatchers("/seller/**").hasAnyRole("SELLER", "ADMIN") 
+                .requestMatchers("/api/payments/webhook").permitAll() 
+                .requestMatchers("/api/payments/process").authenticated() 
+                .requestMatchers("/create").permitAll()
+                .requestMatchers("/getCsrf", "/registoration", "/login", "/AllBooks","/VerifyEmail/**","/ForgotPassword").permitAll()
+                .anyRequest().authenticated() 
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter before authentication
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) 
             .build();
     }
 
@@ -90,7 +90,8 @@ public class AppConfig {
     }
     
     @Bean
-    public OrderRequestDTO orderRequestDTO() {
-        return new OrderRequestDTO(); // Order request DTO bean
+    public OrderResponseDTO orderRequestDTO() {
+        return new OrderResponseDTO(); // Order request DTO bean
     }
+
 }

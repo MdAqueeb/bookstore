@@ -1,20 +1,39 @@
 package com.example.bookstore.Controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+
+// import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.bookstore.DTO.OrderRequestDTO;
+// import com.example.bookstore.DTO.OrderRequestDTO;
+import com.example.bookstore.DTO.OrderResponseDTO;
+import com.example.bookstore.DTO.RazorpaymentDTO;
+// import com.example.bookstore.Entities.Books;
+import com.example.bookstore.Entities.Cart;
 import com.example.bookstore.Entities.Order;
-import com.example.bookstore.Entities.Response;
+import com.example.bookstore.Entities.Payment;
+import com.example.bookstore.Service.CartService;
+// import com.example.bookstore.Entities.OrderItem;
 import com.example.bookstore.Service.OrderService;
+import com.example.bookstore.Service.PayService;
+import com.example.bookstore.Service.PaymentService;
 
-import java.util.List;
+// import io.jsonwebtoken.lang.Arrays;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
+
 
 @RestController
 @RequestMapping("/api/orders")
@@ -23,26 +42,106 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/create")
+    @Autowired
+    private PayService razorpayService;
+
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Value("${razorpay.api.key}")
+    private String  apikey;
+
     // // @PreAuthorize("hasAnyRole('USER','SELLER')")
-    public ResponseEntity<Response> createOrder(@RequestBody OrderRequestDTO orderrequest) {
-        try {
-            
-            Order order = orderService.createOrder(orderrequest);
-            
+    // public ResponseEntity<?> createOrder(@RequestBody OrderRequestDTO orderrequest) {
+
+    //     if(orderrequest.getCartItems() != null){
+    //         return createOrderFromCart(orderrequest.getCartItems());
+    //     }
+    //     else if(orderrequest.getOrderItem() != null){
+    //         return createItemOrder(orderrequest.getOrderItem());
+    //     }
+    //     else{
+    //         return ResponseEntity.badRequest().body("Invalid order Request.");
+    //     }
+
+    // }
+
+    @PostMapping("/create/{bookid}")
+    private ResponseEntity<?> createItemOrder(@PathVariable long bookid) {
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Next move order");
+            Order order = orderService.createSingleOrder(auth.getName(),bookid);
             if(order == null){
-                throw new ResponseStatusException(HttpStatus.CONFLICT);
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
             }
-            // System.out.println()
-            Response<Order> response = new Response<>(
-                HttpStatus.CREATED.value(),
-                "Order created successfully",
-                order
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            OrderResponseDTO res = new OrderResponseDTO();
+            res.setAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(100)).intValue());
+            res.setKey(apikey);
+            res.setRazorpayOrderId(order.getRazorpayOrderId());
+            ArrayList<String> title = new ArrayList<>();
+            title.add(order.getBook().getTitle());
+            res.setBookTitle(title);
+            return new ResponseEntity<>(res,HttpStatus.CREATED);
         }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/create")
+    private ResponseEntity<?> createOrderFromCart() {
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Order order = orderService.createOrderFromCart(auth.getName());
+            if(order == null){
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
+            }
+
+            Cart cartItems = cartService.getCart(auth.getName());
+            if(cartItems == null){
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
+            } 
+            
+            OrderResponseDTO res = new OrderResponseDTO();
+            res.setAmount(cartItems.getTotalAmount().multiply(BigDecimal.valueOf(100)).intValue());
+            res.setRazorpayOrderId(order.getRazorpayOrderId());
+            res.setKey(apikey);
+            ArrayList<String> title = new ArrayList<>();
+            for(int i = 0;i < cartItems.getBooks().size();i++){
+                title.add(cartItems.getBooks().get(i).getTitle());
+            }
+            res.setBookTitle(title);
+            cartService.ClearBooks(cartItems);
+
+            return new ResponseEntity<>(res,HttpStatus.CREATED);
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // We have to add razorpay_payment_id to payment class
+    @PostMapping("/verify-payment")
+    private ResponseEntity<?> verifyPayment(@RequestBody RazorpaymentDTO dto){
+        boolean verified = razorpayService.verifySignature(dto);
+        Order order = orderService.updateOrderStatusToPaid(dto.getRazorpayOrderId());
+        if(!verified){
+            Payment payment = paymentService.AddpaymentDetails(order, "failed");
+            return new ResponseEntity<>(payment,HttpStatus.BAD_REQUEST);
+        }
+
+        
+        if(order == null){
+            
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } 
+
+        Payment payment = paymentService.AddpaymentDetails(order,"paid");
+        return new ResponseEntity<>(payment,HttpStatus.OK);
     }
 
     // @PostMapping("/create-single")

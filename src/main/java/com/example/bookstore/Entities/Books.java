@@ -20,6 +20,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.ToString;
@@ -62,9 +63,9 @@ public class Books {
 
     // why i use all means i not need to store in books table
     @ToString.Exclude
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<OrderItem> orders = new ArrayList<>();
+    private Order order;
 
     // see any missing 
     @ToString.Exclude
@@ -75,4 +76,8 @@ public class Books {
     public enum Approved{
         PENDING,REJECTED,ACCEPTED;
     }
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Wishlist> wishlists = new ArrayList<>();
 }

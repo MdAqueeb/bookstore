@@ -11,7 +11,7 @@ import com.example.bookstore.Entities.RequestSellerRole;
 import com.example.bookstore.Service.RequestSellerSer;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+// import org.springframework.web.bind.annotation.RequestParam;
 import java.util.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +37,7 @@ public class RequestSellerCon {
             System.out.println("It is in the way");
             List<RequestSellerRole> val = request.getAllRequest(email);
             if(val == null) {
-                return new ResponseEntity(val,HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(val,HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(val, HttpStatus.OK);
         } catch(Exception e) {

@@ -36,8 +36,8 @@ public class WishlistService {
             return null;
         }
         
-        obj.setBook(book);
-        obj.setUser(usr.get().getUserid());
+        obj.setBook(bok.get());
+        obj.setUser(usr.get());
         List<Wishlist> identify = wishlistrepo.findByUserBook(usr.get().getUserid(), book);
 
         if(!identify.isEmpty()){
@@ -53,12 +53,15 @@ public class WishlistService {
     public List<Books> GetAll(String email) {
 
         Optional<User> usr = userrepo.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
         List<Wishlist> val = wishlistrepo.findByUserId(usr.get().getUserid());
         List<Books> book = new ArrayList<>();
         for(int i = 0;i < val.size();i++){
-            Optional<Books> bok = bookrepo.findById(val.get(i).getBook());
+            Books bok = val.get(i).getBook();
             System.out.println(val.get(i).getBook());
-            book.add(bok.get());
+            book.add(bok);
 
         }
         // System.out.println(book);

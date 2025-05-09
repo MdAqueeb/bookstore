@@ -110,6 +110,21 @@ public class CartService {
         cartrepo.save(cart);
         return res;
     }
-    
+
+    public Cart getCart(String email) {
+        Optional<User> usr = userrepo.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
+        Optional<Cart> cart = cartrepo.findByUserId(usr.get().getUserid());
+        return cart.get();
+    }
+
+    public Cart ClearBooks(Cart cartItems) {
+        cartItems.getBooks().clear();
+        return cartrepo.save(cartItems);
+    }
+
+
 
 }

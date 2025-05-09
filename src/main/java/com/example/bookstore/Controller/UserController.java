@@ -2,17 +2,19 @@ package com.example.bookstore.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
+// import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.example.bookstore.DTO.ForgotPassword;
 import com.example.bookstore.DTO.LoginForm;
 import com.example.bookstore.DTO.Respon;
 import com.example.bookstore.Entities.Response;
@@ -23,7 +25,9 @@ import com.example.bookstore.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+// import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -115,5 +119,24 @@ public class UserController {
         }
 
     }
+
+    @PostMapping("/VerifyEmail/{email}")
+    public ResponseEntity<String> verifyEmail(@PathVariable String email) {
+        User usr = userlogic.Verify(email);
+        if(usr == null){
+            return new ResponseEntity<>("There is no User",HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("The user Found",HttpStatus.OK);
+    }
+
+    @PutMapping("/ForgotPassword")
+    public ResponseEntity<User> putMethodName(@RequestBody ForgotPassword entity) {
+        User usr = userlogic.UpdatePassword(entity);
+        if(usr == null){
+            return new ResponseEntity<>(usr,HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(usr,HttpStatus.ACCEPTED);
+    }
+    
     
 }

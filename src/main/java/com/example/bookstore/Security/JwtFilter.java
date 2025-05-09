@@ -3,6 +3,7 @@ package com.example.bookstore.Security;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -43,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter{
     UserService user;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException{
+    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain filterChain) throws IOException, ServletException{
         String authHeader = request.getHeader("Authorization");
         
         String token = "";

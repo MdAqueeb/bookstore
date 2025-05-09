@@ -6,13 +6,13 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.bookstore.Entities.Books;
 import com.example.bookstore.Entities.Wishlist;
 import com.example.bookstore.Service.WishlistService;
-import org.springframework.web.bind.annotation.PutMapping;
+// import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +39,7 @@ public class WishlistController {
             String email = auth.getName(); 
             Wishlist val = wishlistServ.AddWishlist(email,bookid);
             if(val == null){
-                return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+                return new ResponseEntity<>(val,HttpStatus.CONFLICT);
             }
             return new ResponseEntity<>(val,HttpStatus.OK);
         }

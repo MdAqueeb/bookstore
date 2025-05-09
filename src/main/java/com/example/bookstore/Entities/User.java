@@ -1,10 +1,11 @@
 package com.example.bookstore.Entities;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -24,7 +26,7 @@ import lombok.*;
 @Table(name = "user")
 @Data
 @Builder
-@NoArgsConstructor  // Required for Hibernate
+@NoArgsConstructor  
 @AllArgsConstructor
 
 public class User {
@@ -44,10 +46,14 @@ public class User {
     @Column(nullable = false)
     private String address;
 
-    // @Builder.Default
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String avator ;
+
+
+    @Column(nullable = false,precision = 10,scale = 2)
+    @Builder.Default
+    private BigDecimal balance = BigDecimal.valueOf(0.00);
 
     @Enumerated(EnumType.STRING)    
     @Column(nullable = false)
@@ -58,33 +64,43 @@ public class User {
         USER,ADMIN,SELLER;
     }
 
-    // Add book listings for seller
     @ToString.Exclude
     @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<Books> bookListings = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "userid",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<RequestSellerRole> requestSellerRole = new ArrayList<>();
     
-    // Indicates if the book listing is approved by admin (for SELLER role)
-    // @Column(nullable = true)
-    // private Boolean isApproved = false;
 
-    // i have to show all orders what i have order from past so i not use all if any other type is missing then provide
     @OneToMany(mappedBy = "user",cascade = {CascadeType.MERGE,CascadeType.REFRESH})
     @JsonIgnore
+    @Builder.Default
     private List<Order> orders = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Cart cart;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Cart> cart = new ArrayList<>();
+    @Builder.Default
+    private List<Wishlist> wishlists = new ArrayList<>();
 
-    // public User orElseThrow(Object object) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
-    // }
+    @OneToMany(mappedBy = "buyerEmail",cascade = {CascadeType.PERSIST, CascadeType.REFRESH},orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<Payment> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "SellerEmail",cascade = {CascadeType.PERSIST, CascadeType.REFRESH},orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<Payment> payments2 = new ArrayList<>();
+
 }

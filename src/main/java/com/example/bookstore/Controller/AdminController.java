@@ -17,7 +17,7 @@ import com.example.bookstore.Service.AdminService;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+// import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -218,7 +218,6 @@ public class AdminController {
 
     @PutMapping("ChangetoUser/{id}")
     public ResponseEntity<User> ChangetoUser(@PathVariable long id) {
-        //TODO: process PUT request
         try {
 
             User val = adminService.ChangeSellerRole(id);
