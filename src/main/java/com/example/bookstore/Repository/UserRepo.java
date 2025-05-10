@@ -27,6 +27,8 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT * FROM user WHERE role = :role",nativeQuery = true)
     Optional<List<User>> findByRole(@Param("role") User.Role role);
-  
+
+    @Query(value = "SELECT * FROM user WHERE role IN ('USER','SELLER')",nativeQuery = true)
+    List<User> findAllRoles();
 }
 

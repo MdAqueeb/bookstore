@@ -200,4 +200,35 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public List<Order> OrderList(String email) {
+        Optional<User> usr = userRepository.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
+        List<Order> order = orderRepository.findByUserUserid(usr.get().getUserid());
+        return order;
+    }
+
+    public Order CancelOrder(String email, String rzporderid) {
+        Optional<User> usr = userRepository.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
+        Order order = orderRepository.findByRazorpayOrderId(rzporderid);
+        if(order == null){
+            return null;
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        return orderRepository.save(order);
+    }
+
+    public Order GetOrder(String email, String rzporderid) {
+        Optional<User> usr = userRepository.findByEmail(email);
+        if(!usr.isPresent()){
+            return null;
+        }
+        System.out.println("Yes find user in orders");
+        return orderRepository.findByRazorpayOrderId(rzporderid);
+    }
+
 }

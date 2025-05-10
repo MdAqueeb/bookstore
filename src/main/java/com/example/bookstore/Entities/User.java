@@ -16,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -28,7 +29,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor  
 @AllArgsConstructor
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,12 +95,17 @@ public class User {
 
     @OneToMany(mappedBy = "buyerEmail",cascade = {CascadeType.PERSIST, CascadeType.REFRESH},orphanRemoval = true)
     @JsonIgnore
+    @ToString.Exclude
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "SellerEmail",cascade = {CascadeType.PERSIST, CascadeType.REFRESH},orphanRemoval = true)
+    @ManyToMany(mappedBy = "SellerEmail",cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnore
+    @ToString.Exclude
     @Builder.Default
     private List<Payment> payments2 = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user")
+    private PurchasedBooks purchaseBook;
 
 }

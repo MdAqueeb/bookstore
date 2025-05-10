@@ -2,6 +2,7 @@ package com.example.bookstore.Controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 // import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,9 @@ import com.example.bookstore.DTO.RazorpaymentDTO;
 import com.example.bookstore.Entities.Cart;
 import com.example.bookstore.Entities.Order;
 import com.example.bookstore.Entities.Payment;
+// import com.example.bookstore.Entities.PurchasedBooks;
 import com.example.bookstore.Service.CartService;
+import com.example.bookstore.Service.MyBookService;
 // import com.example.bookstore.Entities.OrderItem;
 import com.example.bookstore.Service.OrderService;
 import com.example.bookstore.Service.PayService;
@@ -31,6 +34,12 @@ import com.example.bookstore.Service.PaymentService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
 
 
 
@@ -44,6 +53,9 @@ public class OrderController {
 
     @Autowired
     private PayService razorpayService;
+
+    @Autowired
+    private MyBookService mybook;
 
     @Autowired
     private CartService cartService;
@@ -130,7 +142,7 @@ public class OrderController {
         boolean verified = razorpayService.verifySignature(dto);
         Order order = orderService.updateOrderStatusToPaid(dto.getRazorpayOrderId());
         if(!verified){
-            Payment payment = paymentService.AddpaymentDetails(order, "failed");
+            Payment payment = paymentService.AddpaymentDetails(order, "failed",dto);
             return new ResponseEntity<>(payment,HttpStatus.BAD_REQUEST);
         }
 
@@ -140,10 +152,56 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } 
 
-        Payment payment = paymentService.AddpaymentDetails(order,"paid");
+        Payment payment = paymentService.AddpaymentDetails(order,"paid",dto);
+        mybook.AddBooks(order);
         return new ResponseEntity<>(payment,HttpStatus.OK);
     }
 
+    @GetMapping("/getOrders")
+    private ResponseEntity<List<Order>> getOrders(){
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            List<Order> order = orderService.OrderList(auth.getName());
+            if(order == null){
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
+            } 
+            return new ResponseEntity<>(order,HttpStatus.OK);
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{rzporderid}")
+    public ResponseEntity<?> updateOrder(@PathVariable String rzporderid) {
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Order order = orderService.CancelOrder(auth.getName(),rzporderid);
+            if(order == null){
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
+            } 
+            return new ResponseEntity<>(order,HttpStatus.OK);
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/{rzporderid}")
+    public ResponseEntity<?> getOrder(@PathVariable String rzporderid) {
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Wait getting Order");
+            Order order = orderService.GetOrder(auth.getName(),rzporderid);
+            if(order == null){
+                return new ResponseEntity<>(order,HttpStatus.CONFLICT);
+            } 
+            return new ResponseEntity<>(order,HttpStatus.OK);
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
     // @PostMapping("/create-single")
     // @PreAuthorize("hasAnyRole('USER','SELLER')")
     // public ResponseEntity<Response> createSingleItemOrder(

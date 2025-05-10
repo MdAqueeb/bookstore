@@ -85,7 +85,7 @@ public class AdminService {
 
     // User management methods
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllRoles();
     }
 
     public User updateUserRole(long id, User.Role role) {

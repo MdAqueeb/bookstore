@@ -80,4 +80,8 @@ public class Books {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Wishlist> wishlists = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "purchase_id")
+    private PurchasedBooks purchasedBooks;
 }
