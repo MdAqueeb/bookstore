@@ -4,12 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.bookstore.Entities.Books;
+import com.example.bookstore.Entities.SalesOverview;
 import com.example.bookstore.Entities.User;
 import com.example.bookstore.Repository.BookRepo;
+import com.example.bookstore.Repository.SalesOverView;
 // import com.example.bookstore.Repository.BooksRepository;
 import com.example.bookstore.Repository.UserRepo;
 
+import lombok.val;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 // import java.util.stream.Collectors;
@@ -22,6 +27,9 @@ public class SellerService {
 
     @Autowired
     private UserRepo userRepository;
+
+    @Autowired
+    private SalesOverView repo;
 
     public Books addBook(Books book, String email) {
         Optional<User> optionalSeller = userRepository.findByEmail(email);
@@ -69,20 +77,33 @@ public class SellerService {
         if(seller == null){
             throw new RuntimeException("User not found");
         }
-        // Check if the book belongs to this seller
+
         Books existingBook = seller.getBookListings().stream()
                 .filter(b -> b.getBookid() == bookId)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Book not found or not owned by this seller"));
-        
-        // Update the book properties
+        SalesOverview sales = repo.findByUserid(seller.getUserid());
+        if(sales == null){
+            sales = new SalesOverview();
+            sales.setSeller(existingBook.getSeller());
+        }
+        HashMap<String,Integer> b = sales.getVar();
+        if(b.containsKey(existingBook.getTitle())){
+            int value = b.get(existingBook.getTitle());
+            b.remove(existingBook.getTitle());
+            b.put(updatedBook.getTitle(), value);
+        }
+        else{
+            b.put(updatedBook.getTitle(), 0);
+        }
+        sales.setVar(b);
+        repo.save(sales);
+
         existingBook.setTitle(updatedBook.getTitle());
         existingBook.setAuthor(updatedBook.getAuthor());
         existingBook.setDescription(updatedBook.getDescription());
         existingBook.setPrice(updatedBook.getPrice());
         existingBook.setImage(updatedBook.getImage());
-        
-        // Save the updated book
         return booksRepository.save(existingBook);
     }
 

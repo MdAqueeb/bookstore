@@ -11,9 +11,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.bookstore.Entities.Books;
 import com.example.bookstore.Entities.Response;
+import com.example.bookstore.Entities.SalesOverview;
 import com.example.bookstore.Entities.User;
+import com.example.bookstore.Repository.SalesOverView;
 import com.example.bookstore.Service.SellerService;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,8 @@ public class SellerController {
     @Autowired
     private SellerService sellerService;
 
+    @Autowired 
+    private SalesOverView repo;
     // Add a new book listing
     @PostMapping("/books")
     public ResponseEntity<Books> addBook(@RequestBody Books book) {
@@ -32,6 +37,15 @@ public class SellerController {
             String email = auth.getName();
             System.out.println(email+" This is the email");
             Books savedBook = sellerService.addBook(book, email);
+
+            SalesOverview sales = repo.findByUserid(book.getSeller().getUserid());
+            if(sales == null){
+                sales = new SalesOverview();
+                sales.setSeller(book.getSeller());
+            }
+            HashMap<String,Integer> b = sales.getVar();
+            b.put(book.getTitle(), 0);
+            sales.setVar(b);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -57,7 +71,9 @@ public class SellerController {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
+
             Books updatedBook = sellerService.updateBook(id, book, email);
+
             return ResponseEntity.ok(updatedBook);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

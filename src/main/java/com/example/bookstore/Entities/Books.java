@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 // import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
@@ -78,10 +80,12 @@ public class Books {
     }
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     @JsonIgnore
     private List<Wishlist> wishlists = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "purchase_id")
-    private PurchasedBooks purchasedBooks;
+    @ManyToMany(mappedBy = "books")
+    @ToString.Exclude
+    @JsonBackReference
+    private List<PurchasedBooks> purchaseRecords = new ArrayList<>();
 }

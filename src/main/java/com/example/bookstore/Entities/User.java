@@ -106,6 +106,13 @@ public class User {
     private List<Payment> payments2 = new ArrayList<>();
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore
+    @ToString.Exclude
     private PurchasedBooks purchaseBook;
+
+    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<SalesOverview> salesOverView;
 
 }

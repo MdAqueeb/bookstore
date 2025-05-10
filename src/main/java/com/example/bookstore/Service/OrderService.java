@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 // import com.example.bookstore.Service.PaymentService;
 // import java.util.stream.Collectors;
 
+// import java.util.ArrayList;
 import java.util.HashSet;
 // import java.util.Iterator;
 import java.util.List;
@@ -103,14 +104,46 @@ public class OrderService {
         if(!usr.isPresent() || !bok.isPresent()){
             return null;
         }
-        Order chk = orderRepository.findByUseridBookid(usr.get().getUserid(),bok.get().getBookid());
-        if(chk != null && chk.getStatus() != OrderStatus.PAID){
-            return chk;
+        System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
+        List<Books> purchased =  usr.get().getPurchaseBook().getBooks();
+        List<Order> usrOrders = usr.get().getOrders();
+        for(int i = 0;i < purchased.size();i++){
+            if(bookid == purchased.get(i).getBookid()){
+                return null;
+            }
         }
-        else if(chk != null && chk.getStatus() == OrderStatus.PAID){
-            return null;
+        Order order ;
+        for(int j = 0;j < usrOrders.size();j++){
+            if(usrOrders.get(j).getBook() != null && usrOrders.get(j).getStatus().equals(OrderStatus.PAID)){
+                if(usrOrders.get(j).getBook().getBookid() ==  bookid){
+                    return null;
+                }
+            }
+            else if(usrOrders.get(j).getBook() != null && usrOrders.get(j).getStatus().equals(OrderStatus.PENDING)){
+                order =  usrOrders.get(j);
+            }
+            else if(usrOrders.get(j).getCart() != null && usrOrders.get(j).getStatus().equals(OrderStatus.PAID)){
+                for(int k = 0;k < usrOrders.get(j).getCart().getBooks().size();k++){
+                    if(usrOrders.get(j).getCart().getBooks().get(k).getBookid() == bookid){
+                        return null;
+                    }
+                }
+            }
+            else if(usrOrders.get(j).getCart() != null && usrOrders.get(j).getStatus().equals(OrderStatus.PENDING)){
+                for(int k = 0;k < usrOrders.get(j).getCart().getBooks().size();k++){
+                    if(usrOrders.get(j).getCart().getBooks().get(k).getBookid() == bookid){
+                        Cart cart = usrOrders.get(j).getCart();
+                        List<Books> book = cart.getBooks(); 
+                        book.remove(k);
+                        cart.setTotalAmount(cart.getTotalAmount().subtract(book.get(k).getPrice()));
+                        cart.setTotalItems(cart.getTotalItems()-1);
+                        cart.setBooks(book);
+                        cartRepository.save(cart);
+                    }
+                }
+            }
         }
-        Order order = new Order();
+        order = new Order();
         order.setUser(usr.get());
         order.setBook(bok.get());
         order.setTotalAmount(bok.get().getPrice());
@@ -197,6 +230,22 @@ public class OrderService {
             return null;
         }
         order.setStatus(OrderStatus.PAID);
+        if(order.getBook() == null || order.getCart() != null){
+            for(int i = 0;i < order.getCart().getBooks().size();i++){
+                User seller = order.getCart().getBooks().get(i).getSeller();
+                seller.setBalance(seller.getBalance().add(order.getCart().getBooks().get(i).getPrice()));
+                userRepository.save(seller);
+                Cart cart = order.getCart();
+                cart.getBooks().clear();
+                cartRepository.save(cart);
+                
+            }
+        }
+        else if(order.getBook() != null){
+            User seller = order.getBook().getSeller();
+            seller.setBalance(seller.getBalance().add(order.getBook().getPrice()));
+            userRepository.save(seller);
+        }
         return orderRepository.save(order);
     }
 

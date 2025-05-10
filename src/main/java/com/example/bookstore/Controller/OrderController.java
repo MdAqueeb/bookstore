@@ -2,7 +2,9 @@ package com.example.bookstore.Controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ import com.example.bookstore.DTO.RazorpaymentDTO;
 import com.example.bookstore.Entities.Cart;
 import com.example.bookstore.Entities.Order;
 import com.example.bookstore.Entities.Payment;
+import com.example.bookstore.Entities.SalesOverview;
+import com.example.bookstore.Entities.User;
+import com.example.bookstore.Repository.SalesOverView;
 // import com.example.bookstore.Entities.PurchasedBooks;
 import com.example.bookstore.Service.CartService;
 import com.example.bookstore.Service.MyBookService;
@@ -62,6 +67,9 @@ public class OrderController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private SalesOverView salesRepo;
 
     @Value("${razorpay.api.key}")
     private String  apikey;
@@ -127,7 +135,6 @@ public class OrderController {
                 title.add(cartItems.getBooks().get(i).getTitle());
             }
             res.setBookTitle(title);
-            cartService.ClearBooks(cartItems);
 
             return new ResponseEntity<>(res,HttpStatus.CREATED);
         }
@@ -154,6 +161,58 @@ public class OrderController {
 
         Payment payment = paymentService.AddpaymentDetails(order,"paid",dto);
         mybook.AddBooks(order);
+
+        if(order.getBook() != null){
+            SalesOverview sles = salesRepo.findByUserid(order.getBook().getSeller().getUserid());
+            if(sles == null){
+                sles = new SalesOverview();
+                sles.setSeller(order.getBook().getSeller());
+            }
+            HashMap<String,Integer> books = sles.getVar();
+            sles.setOrdercount(sles.getOrdercount()+1);
+
+            if(books.containsKey(order.getBook().getTitle())){
+                books.put(order.getBook().getTitle(), books.get(order.getBook().getTitle())+1);
+            }
+            else{
+                books.put(order.getBook().getTitle(), 1);
+            }
+            sles.setVar(books);
+            salesRepo.save(sles);
+        }
+        else if(order.getCart() != null){
+            ArrayList<User> chk = new ArrayList<>();
+            for(int i = 0 ;i < order.getCart().getBooks().size();i++){
+                User selman = order.getCart().getBooks().get(i).getSeller();
+                int found = 0;
+                for(int j = 0;j < chk.size();j++){
+                    if(chk.get(j).getUserid() == selman.getUserid()){
+                        found = 1;
+                    }
+                }
+                if(found == 0){
+                    chk.add(selman);
+                }
+                SalesOverview sles = salesRepo.findByUserid(order.getCart().getBooks().get(i).getSeller().getUserid());
+                if(sles == null){
+                    sles = new SalesOverview();
+                    sles.setSeller(order.getCart().getBooks().get(i).getSeller());
+                }
+                HashMap<String,Integer> books = sles.getVar();
+                if(found == 0 ){
+                    sles.setOrdercount(sles.getOrdercount()+1);
+                }
+                if(books.containsKey(order.getBook().getTitle())){
+                    books.put(order.getBook().getTitle(), books.get(order.getBook().getTitle())+1);
+                }
+                else{
+                    books.put(order.getBook().getTitle(), 1);
+                }
+                sles.setVar(books);
+                salesRepo.save(sles);
+            }
+        }
+        
         return new ResponseEntity<>(payment,HttpStatus.OK);
     }
 

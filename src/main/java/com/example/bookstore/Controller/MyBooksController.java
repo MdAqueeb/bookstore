@@ -1,6 +1,6 @@
 package com.example.bookstore.Controller;
 
-import java.util.List;
+// import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class MyBooksController {
     public ResponseEntity<?> getMethodName() {
         try{
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            List<PurchasedBooks> books = mybook.GetPurchaseBooks(auth.getName());
+            PurchasedBooks books = mybook.GetPurchaseBooks(auth.getName());
             if(books == null){
                 return new ResponseEntity<>(books,HttpStatus.CONFLICT);
             } 
