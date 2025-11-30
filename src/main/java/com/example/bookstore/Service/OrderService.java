@@ -101,7 +101,7 @@ public class OrderService {
     public Order createSingleOrder(String email, long bookid) throws RazorpayException {
         Optional<User> usr = userRepository.findByEmail(email);
         Optional<Books> bok = bookRepository.findById(bookid);
-        if(!usr.isPresent() || !bok.isPresent()){
+        if(usr.isEmpty() || bok.isEmpty()){
             return null;
         }
         System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
@@ -165,11 +165,11 @@ public class OrderService {
     @Transactional
     public Order createOrderFromCart(String email) throws RazorpayException {
         Optional<User> usr =  userRepository.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         Optional<Cart> cartItems = cartRepository.findByUserId(usr.get().getUserid());
-        if(!cartItems.isPresent()){
+        if(cartItems.isEmpty()){
             return null;
         }
         List<Order> chk = cartItems.get().getOrders();
@@ -251,7 +251,7 @@ public class OrderService {
 
     public List<Order> OrderList(String email) {
         Optional<User> usr = userRepository.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         List<Order> order = orderRepository.findByUserUserid(usr.get().getUserid());
@@ -260,7 +260,7 @@ public class OrderService {
 
     public Order CancelOrder(String email, String rzporderid) {
         Optional<User> usr = userRepository.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         Order order = orderRepository.findByRazorpayOrderId(rzporderid);
@@ -273,7 +273,7 @@ public class OrderService {
 
     public Order GetOrder(String email, String rzporderid) {
         Optional<User> usr = userRepository.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         System.out.println("Yes find user in orders");

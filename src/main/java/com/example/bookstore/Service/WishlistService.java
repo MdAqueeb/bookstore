@@ -32,7 +32,7 @@ public class WishlistService {
         Optional<User> usr = userrepo.findByEmail(user);
         Optional<Books> bok = bookrepo.findById(book);
         
-        if(!usr.isPresent() || !bok.isPresent()){
+        if(usr.isEmpty() || bok.isEmpty()){
             return null;
         }
         
@@ -53,7 +53,7 @@ public class WishlistService {
     public List<Books> GetAll(String email) {
 
         Optional<User> usr = userrepo.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         List<Wishlist> val = wishlistrepo.findByUserId(usr.get().getUserid());
@@ -73,10 +73,10 @@ public class WishlistService {
         System.out.println("It is in RemoveBook method");
         Optional<User> usr = userrepo.findByEmail(email);
         Optional<Books> book = bookrepo.findById(bookid);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return "User Not Found";
         }
-        if(!book.isPresent()){
+        if(book.isEmpty()){
             return "Book Not Found";
         }
         wishlistrepo.RemoveByEmailAndId(usr.get().getUserid(),bookid);

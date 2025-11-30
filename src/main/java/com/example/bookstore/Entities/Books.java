@@ -14,6 +14,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,10 +25,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
 @Entity
+@Builder
 @Data
 @Table(name = "books")
 // @ToString
@@ -37,15 +42,19 @@ public class Books {
     private long bookid;
 
     @Column(nullable =  false)
+    @NotBlank(message = "Title should be not empty or blank")
     private String title;
 
     @Column(nullable = false)
+    @NotBlank(message = "Author not be null or blank")
     private String author;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotBlank
     private String description;
 
-    @Column(nullable = false,precision = 10,scale = 2)
+    @Column(nullable = false,precision = 10,scale = 2,columnDefinition = "DECIMAL(10,2)")
+    @NotNull
     private BigDecimal price;
 
     @Lob
@@ -54,10 +63,11 @@ public class Books {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Approved approved ;
+    @Builder.Default
+    private Approved approved = Approved.PENDING;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sellerid", nullable = false) // Link book to seller
     // @JsonIgnore
     private User seller; 
@@ -73,6 +83,7 @@ public class Books {
     @ToString.Exclude
     @ManyToMany(mappedBy = "books")
     @JsonIgnore
+    @Builder.Default
     private List<Cart> cart = new ArrayList<>();
 
     public enum Approved{
@@ -82,10 +93,12 @@ public class Books {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @JsonIgnore
+    @Builder.Default
     private List<Wishlist> wishlists = new ArrayList<>();
 
     @ManyToMany(mappedBy = "books")
     @ToString.Exclude
     @JsonBackReference
+    @Builder.Default
     private List<PurchasedBooks> purchaseRecords = new ArrayList<>();
 }

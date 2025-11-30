@@ -23,12 +23,15 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import jakarta.persistence.SequenceGenerator;
 
 @Entity
 @Data
+@Builder
 @Table(name = "cart")
 public class Cart {
 
@@ -38,7 +41,7 @@ public class Cart {
     private long cartid;
 
     // @JsonIgnore
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid")
     @ToString.Exclude
     private User user;
@@ -47,7 +50,8 @@ public class Cart {
     @JsonIgnore
     private List<Order> orders; 
 
-    @ManyToMany(cascade = CascadeType.PERSIST)  
+    @Builder.Default
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)  
     @JsonIgnore
     @ToString.Exclude
     @JoinTable(
@@ -56,11 +60,13 @@ public class Cart {
         inverseJoinColumns = @JoinColumn(name = "bookid"))
     private List<Books> books = new ArrayList<>();
 
-    @Column(name = "totalamount")
+    @Column(name = "totalamount", columnDefinition = "DECIMAL(10,2)")
+    @NotNull
     private BigDecimal totalAmount;
 
-    @Column(name = "totalitems")
-    private int totalItems;
+    @Column(name = "totalitems", nullable = false)
+    @Builder.Default
+    private int totalItems = 0;
 
     @PrePersist
     @PreUpdate

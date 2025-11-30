@@ -34,7 +34,7 @@ public class SellerService {
     public Books addBook(Books book, String email) {
         Optional<User> optionalSeller = userRepository.findByEmail(email);
     
-        if (!optionalSeller.isPresent()) {
+        if (optionalSeller.isEmpty()) {
             throw new RuntimeException("User not found");
         }
     

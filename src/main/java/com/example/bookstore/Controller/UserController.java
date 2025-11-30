@@ -22,7 +22,10 @@ import com.example.bookstore.Entities.User;
 import com.example.bookstore.Repository.UserRepo;
 import com.example.bookstore.Service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 // import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
+@Tag(name = "User EndPoints", description = "All User Endpoints here")
 public class UserController {
 
     @Autowired
@@ -41,7 +45,7 @@ public class UserController {
     private UserRepo userrepo;
     // Signup form 
     @PostMapping("/registoration")
-    public ResponseEntity<User> signup(@RequestBody User user) {
+    public ResponseEntity<User> signup(@RequestBody @Valid User user) {
         try{
             User usr = userlogic.registor(user);
             

@@ -10,6 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.bookstore.Entities.RequestSellerRole;
 import com.example.bookstore.Service.RequestSellerSer;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.RequestParam;
 import java.util.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+@Tag(name = "Seller Request Endpoint", description = "All User request Endpoints")
 @PreAuthorize("hasRole('USER','ADMIN')")
 public class RequestSellerCon {
 

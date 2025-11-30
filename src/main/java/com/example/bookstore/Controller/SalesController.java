@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
+
 public class SalesController {
     
     @Autowired 
@@ -40,7 +41,7 @@ public class SalesController {
             System.out.println(email);
             Optional<User> usr = usrrepo.findByEmail(email);
             System.out.println(usr.isPresent());
-            if(!usr.isPresent()){
+            if(usr.isEmpty()){
                 return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
             }
             SalesOverview sles = repo.findByUserid(usr.get().getUserid());

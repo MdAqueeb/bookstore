@@ -20,6 +20,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 
@@ -35,12 +38,16 @@ public class User {
     private long userid;
 
     @Column(nullable = false)
+    @NotBlank(message = "The name should be not null or blank")
+    @Pattern(regexp = "^[A-Za-z_]{1}[A-Za-z0-9_@$& ]{2,}$", message = "The name is invalid")
     private String name;
 
     @Column(nullable = false,unique = true)
+    @Email
     private String email;
 
     @Column(nullable = false)
+    @NotBlank
     private String password;
 
     @Column(nullable = false)

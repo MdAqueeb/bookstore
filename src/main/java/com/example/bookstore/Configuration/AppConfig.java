@@ -37,12 +37,12 @@ public class AppConfig {
     private UserdetailService userDetailsService;
 
     @Bean
-    public SecurityFilterChain ownsecurity(HttpSecurity http) throws Exception {
+    SecurityFilterChain ownsecurity(HttpSecurity http) throws Exception {
         return http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                .requestMatchers("/swagger-ui/index.html", "/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() 
                 .requestMatchers("/admin/**").hasRole("ADMIN") 
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN") 
                 .requestMatchers("/seller/**").hasAnyRole("SELLER", "ADMIN") 
@@ -58,7 +58,7 @@ public class AppConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
         // Add your allowed origins (this should match your front-end URLs)
@@ -77,7 +77,7 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // Set the password encoder for bcrypt
         provider.setUserDetailsService(userDetailsService); // Use the custom UserdetailService
@@ -85,12 +85,12 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    
+
     @Bean
-    public OrderResponseDTO orderRequestDTO() {
+    OrderResponseDTO orderRequestDTO() {
         return new OrderResponseDTO(); // Order request DTO bean
     }
 

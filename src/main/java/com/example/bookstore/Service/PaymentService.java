@@ -63,7 +63,7 @@ public class PaymentService {
 
     public List<Payment> GetPayments(String name) {
         Optional<User> usr = userRepo.findByEmail(name);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         Optional<List<Payment>> payment = paymentRepository.findByUserid(usr.get().getUserid());

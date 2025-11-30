@@ -13,6 +13,8 @@ import com.example.bookstore.Entities.Cart;
 // import com.example.bookstore.Entities.Wishlist;
 import com.example.bookstore.Service.CartService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
-
+@Tag(name = "Cart EndPoints", description = "All Cart Endpoints of user")
 public class CartController {
 
     @Autowired

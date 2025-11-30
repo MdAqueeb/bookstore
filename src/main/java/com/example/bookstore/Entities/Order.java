@@ -9,6 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +20,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 // import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,17 +40,20 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long orderid;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid", nullable = false)
     @ToString.Exclude
+    @NotNull
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookid")
     @ToString.Exclude
+    @NotNull
     private Books book ;
 
     @Column(nullable = false, precision = 10, scale = 2)
+    @NotNull
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)

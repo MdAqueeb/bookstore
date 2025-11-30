@@ -24,7 +24,7 @@ public class RequestSellerSer {
 
         Optional<User> usr = user.findByEmail(email); 
         
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         System.out.println(usr.get().getName());
@@ -34,7 +34,7 @@ public class RequestSellerSer {
     public RequestSellerRole addRequest(String email, RequestSellerRole entity) {
         // TODO Auto-generated method stub
         Optional<User> usr = user.findByEmail(email); 
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         System.out.println(usr.get());

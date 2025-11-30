@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Column;
 @Entity
 @Data
@@ -23,10 +25,12 @@ public class Wishlist {
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "userid")
+    @NotNull
     private User user;
 
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "bookid")
+    @NotNull
     private Books book;
 }

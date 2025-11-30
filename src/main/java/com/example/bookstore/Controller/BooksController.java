@@ -6,6 +6,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.bookstore.Entities.Books;
 import com.example.bookstore.Service.BookService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +26,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
+@Tag(name = "Books EndPoints", description = "All Books Endpoints with user Authorization")
 public class BooksController {
 
     @Autowired
     private BookService booklogic;
 
+    @Operation(summary="Adding new Book", description = "Return the Rejection")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Rejected successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/AddBooks")
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
-    public ResponseEntity<Books> AddingBooks(@RequestBody Books entity) {
+    public ResponseEntity<Books> AddingBooks(@RequestBody @Valid Books entity) {
         try {
             // Get the authenticated user's email
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();

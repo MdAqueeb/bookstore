@@ -14,9 +14,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.bookstore.Entities.Payment;
 import com.example.bookstore.Service.PaymentService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 @RestController
 @RequestMapping("/api/payments")
+@Tag(name = "Payment Endpoints", description = "All Payment Endpoints here")
 public class PaymentController {
 
     @Autowired

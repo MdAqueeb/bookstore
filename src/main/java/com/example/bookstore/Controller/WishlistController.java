@@ -8,6 +8,8 @@ import com.example.bookstore.Entities.Wishlist;
 import com.example.bookstore.Service.WishlistService;
 // import org.springframework.web.bind.annotation.PutMapping;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
+@Tag(name = "Wishlist Endpoints", description = "All Wishlist Endpoints here")
 public class WishlistController {
 
     @Autowired

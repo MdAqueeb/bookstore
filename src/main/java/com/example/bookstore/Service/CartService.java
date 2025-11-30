@@ -46,12 +46,17 @@ public class CartService {
         Optional<Cart> cart = cartrepo.findByUserId(usr.getUserid());
 
         Cart cartToSave;
-        if (!cart.isPresent()) {
+        if (cart.isEmpty()) {
             // If the cart doesn't exist, create a new one
-            cartToSave = new Cart();
-            cartToSave.setUser(usr);
-            cartToSave.setTotalAmount(BigDecimal.ZERO);
-            cartToSave.setTotalItems(0);
+            // cartToSave = new Cart();
+            cartToSave = Cart.builder()
+                        .user(usr)
+                        .totalAmount(BigDecimal.ZERO)
+                        .totalItems(0)
+                        .build();
+            // cartToSave.setUser(usr);
+            // cartToSave.setTotalAmount(BigDecimal.ZERO);
+            // cartToSave.setTotalItems(0);
         } else {
             cartToSave = cart.get();
         }
@@ -72,7 +77,7 @@ public class CartService {
     public List<Books> getItemsInCart(String email) {
         // Find the user's cart by their user ID
         Optional<User> usr = userrepo.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             // System.out.println(usr.get());
             return new ArrayList<>();
         }
@@ -80,7 +85,7 @@ public class CartService {
         Optional<Cart> cart = cartrepo.findByUserId(usr.get().getUserid());
 
 
-        if(!cart.isPresent()) { 
+        if(cart.isEmpty()) { 
             return new ArrayList<>();
         }
 
@@ -113,7 +118,7 @@ public class CartService {
 
     public Cart getCart(String email) {
         Optional<User> usr = userrepo.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         Optional<Cart> cart = cartrepo.findByUserId(usr.get().getUserid());

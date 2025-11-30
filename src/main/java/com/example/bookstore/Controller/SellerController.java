@@ -16,6 +16,8 @@ import com.example.bookstore.Entities.User;
 import com.example.bookstore.Repository.SalesOverView;
 import com.example.bookstore.Service.SellerService;
 
+import jakarta.validation.Valid;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class SellerController {
     private SalesOverView repo;
     // Add a new book listing
     @PostMapping("/books")
-    public ResponseEntity<Books> addBook(@RequestBody Books book) {
+    public ResponseEntity<Books> addBook(@RequestBody @Valid Books book) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
@@ -67,7 +69,7 @@ public class SellerController {
 
     // Update a book listing
     @PutMapping("/books/{id}")
-    public ResponseEntity<Books> updateBook(@PathVariable long id, @RequestBody Books book) {
+    public ResponseEntity<Books> updateBook(@PathVariable long id, @RequestBody @Valid Books book) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();

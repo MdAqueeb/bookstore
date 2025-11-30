@@ -43,7 +43,7 @@ public class UserService {
         try {
             Optional<User> user = usertable.findByEmail(form.getEmail());
             
-            if(!user.isPresent()){
+            if(user.isEmpty()){
                 return "Login failed";
             }
             User usr = user.get();
@@ -73,7 +73,7 @@ public class UserService {
 
     public User getUser(String email) {
         Optional<User> user = usertable.findByEmail(email);
-        if(!user.isPresent()){
+        if(user.isEmpty()){
             return null;
         }
         return user.get();
@@ -82,7 +82,7 @@ public class UserService {
 
     public User Verify(String email) {
         Optional<User> usr = usertable.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         return usr.get();
@@ -90,7 +90,7 @@ public class UserService {
 
     public User UpdatePassword(ForgotPassword entity) {
         Optional<User> usr = usertable.findByEmail(entity.getEmail());
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
         if(entity.getPassword().equals(entity.getConfirmPassword())){

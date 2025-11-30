@@ -25,7 +25,7 @@ public class MyBookService {
 
     public PurchasedBooks GetPurchaseBooks(String email) {
         Optional<User> usr = user.findByEmail(email);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
 

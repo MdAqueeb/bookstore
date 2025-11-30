@@ -176,7 +176,7 @@ public class AdminService {
 
     public User ChangeRole(long id) {
         Optional<User> usr = userRepository.findById(id);
-        if(!usr.isPresent()){
+        if(usr.isEmpty()){
             return null;
         }
 
@@ -219,7 +219,7 @@ public class AdminService {
         
         Optional<User> seller = userRepository.findById(id);
 
-        if(!seller.isPresent()){
+        if(seller.isEmpty()){
             return null;
         }
 

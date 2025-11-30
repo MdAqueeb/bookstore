@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+// import io.jsonwebtoken.lang.Arrays;
+
+// import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,14 +39,7 @@ import com.example.bookstore.Service.OrderService;
 import com.example.bookstore.Service.PayService;
 import com.example.bookstore.Service.PaymentService;
 
-// import io.jsonwebtoken.lang.Arrays;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-// import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 
@@ -50,6 +47,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
+@Tag(name = "Order EndPoints", description = "All Order Endpoints")
 @RequestMapping("/api/orders")
 public class OrderController {
 

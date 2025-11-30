@@ -13,11 +13,15 @@ import org.springframework.web.server.ResponseStatusException;
 // import com.example.bookstore.Entities.Order;
 import com.example.bookstore.Entities.PurchasedBooks;
 import com.example.bookstore.Service.MyBookService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
+@Tag(name = "Purchaced Books EndPoints", description = "Buyed Books Endpoints")
 public class MyBooksController {
     
     @Autowired
